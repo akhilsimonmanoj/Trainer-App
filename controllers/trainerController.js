@@ -1,53 +1,48 @@
 const Trainer = require('../models/Trainer')
-const trainerController = {}
+const User = require('../models/User')
 
-trainerController.create = async (req, res) => {
-    const body = req.body
-    try {
-        const trainer = await Trainer.create(body)
-        return res.status(200).json(trainer) 
-    } catch (error) {
-        return res.json(error.message)
-    }
+exports.getAllTrainers = (req, res) => {
+    Trainer.find()
+        .populate('user')
+        .then((trainers) => res.json(trainers))
+        .catch((err) => res.status(500).json({ message: err.message }))
 }
 
-trainerController.list = async (req, res) => {
+exports.addTrainer = async (req, res) => {
     try {
-        const trainer = await Trainer.find()
-        return res.status(200).json({message: 'All Trainers', trainer})
-    } catch (error) {
-        return res.status(401).json(error.message)
-    }
-}
+        const { name, email, expertise, contactInfo } = req.body
 
-trainerController.update = async (req, res) => {
-    const id = req.params.id
-    const body = req.body
-    try {
-        let trainer = await Trainer.findById(id)
-        if(!trainer){
-            return res.json('Trainer not found')
+        // Check if a user account already exists for this email
+        const existingUser = await User.findOne({ email })
+        if (existingUser) {
+            return res.status(400).json({ message: 'User with this email already exists' })
         }
-        trainer = await Trainer.findByIdAndUpdate(id, body, {new: true, runValidators: true})
-        return res.status(200).json('trainer updated', trainer)
+        // Create a corresponding User account with default password
+        const defaultPassword = 'password123' // You can generate a random password here
+        const user = new User({ name, email, password: defaultPassword, role: 'Trainer' })
+        await user.save()
+
+        // Create a new Trainer
+        const trainer = new Trainer({ name, expertise, availability: true, contactInfo, user: user._id }).populate('user')
+        await trainer.save()
+
+        const populatedTrainer = await Trainer.findById(trainer._id).populate('user')
+
+
+        res.status(201).json({ message: 'Trainer and user account created successfully', trainer: populatedTrainer })
     } catch (error) {
-        return res.json(error.message)
+        res.status(500).json({ message: error.message })
     }
 }
 
-trainerController.delete = async (req, res) => {
-    const id = req.params.id
-    try {
-        const trainer = await Trainer.findById(id)
-        if(!trainer){
-            return res.json('Trainer not found')
-        }
-        await trainer.remove()
-        return res.json('Trainer deleted')
-    } catch (error) {
-        return res.json(error.message)
-    }
-    
+exports.updateTrainer = (req, res) => {
+    Trainer.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('user')
+        .then((trainer) => res.json(trainer))
+        .catch((err) => res.status(400).json({ message: err.message }))
 }
 
-module.exports = trainerController
+exports.deleteTrainer = (req, res) => {
+    Trainer.findByIdAndDelete(req.params.id).populate('user')
+        .then(() => res.status(204).json('Trainer deleted'))
+        .catch((err) => res.status(400).json({ message: err.message }))
+}

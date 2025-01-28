@@ -1,27 +1,42 @@
 const express = require('express')
-const userController = require('../controllers/userController')
-const trainerController = require('../controllers/trainerController')
-const oppurtunityController = require('../controllers/oppurtunrityController')
-const {authenticateUser} = require('../middleware/authentication')
 const router = express.Router()
 
-//USER ROUTES
+const trainerController = require('../controllers/trainerController')
+const opportunityController = require('../controllers/opportunrityController')
+const operationController = require('../controllers/operationController')
+const userController = require('../controllers/userController')
+const {authenticateUser} = require('../middleware/authentication')
+const { authorizeRoles } = require('../middleware/authorize')
+
+// Trainer Routes
+router.get('/trainers', trainerController.getAllTrainers)
+router.post('/trainers', trainerController.addTrainer)
+router.put('/trainers/:id', trainerController.updateTrainer)
+router.delete('/trainers/:id', trainerController.deleteTrainer)
+
+// Opportunity Routes
+// Get all opportunities
+router.get('/opportunities', opportunityController.getAllOpportunities);
+// Add a new opportunity
+router.post('/opportunities', opportunityController.addOpportunity);
+// Express interest in an opportunity
+router.put('/opportunities/:id/interest', opportunityController.expressInterest);
+
+// Operation Routes
+router.get('/operations', operationController.getAllOperations)
+router.post('/operations', operationController.addOperation) 
+router.put('/operations/:id/performance', operationController.updatePerformance)
+
+// User Routes
 router.post('/user/register', userController.register)
 router.post('/user/login', userController.login)
-router.get('/user/account', authenticateUser, userController.getAccount)
 
-//TRAINER ROUTES
-router.post('/trainer', trainerController.create)
-router.get('/trainer', trainerController.list)
-router.put('/trainer/:id', trainerController.update)
-router.delete('/trainer/:id', trainerController.delete)
+// Protected route for getting user profile
+router.get('/user/profile', authenticateUser, userController.getProfile)
 
-router.post('/oppurtunity', oppurtunityController.create)
-router.post('/oppurtunity/interest/:id', oppurtunityController.interest)
-router.get('/oppurtunity', oppurtunityController.list)
-router.get('/oppurtunity/:id', oppurtunityController.show)
-router.put('/oppurtunity/:id', oppurtunityController.update)
-router.delete('/oppurtunity/:id', oppurtunityController.delete)
+// Example: Restricted to Admin role
+router.get('/user/admin', authenticateUser, authorizeRoles('Admin'), (req, res) => {
+    res.json({ message: 'Welcome Admin' })
+})
 
 module.exports = router
-

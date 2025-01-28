@@ -1,26 +1,15 @@
-const mongoose = require('mongoose')
-const { applyTimestamps } = require('./User')
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
 
-const trainerSchema = new Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String
-    },
-    skills: {
-        type: [String]
-    },
-    availability: {
-        type: Boolean,
-        default: true
-    },
+const trainerSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    expertise: [{ type: String, required: true }],
+    availability: { type: Boolean, default: true },
     experience: {
         type: Number
-    }
-}, {timestamps: true})
+    },
+    contactInfo: { type: String, required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+});
 
-const Trainer = mongoose.model('Trainer', trainerSchema)
-module.exports = Trainer
+const Trainer = mongoose.model('Trainer', trainerSchema);
+module.exports = Trainer;

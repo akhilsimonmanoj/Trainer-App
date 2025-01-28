@@ -15,75 +15,115 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Switch,
+  FormControlLabel,
 } from '@mui/material';
 import axios from '../config/axiosConfig';
 
 const TrainerPage = ({ user }) => {
-  const userRole = JSON.parse(user);
-  console.log({ userRole: userRole.role });
+  const userRole = user?.role;
   const [trainers, setTrainers] = useState([]);
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     expertise: '',
-    availability: '',
-    contact: '',
-    email: '', // Add email to the form data
+    availability: true,
+    contactInfo: '',
+    email: '',
   });
   const [editId, setEditId] = useState(null);
 
-  const fetchTrainers = async () => {
-    const response = await axios.get('/api/trainers');
-    console.log(response.data);
-    setTrainers(response.data);
-  };
+  // Fetch trainers on component mount
+  useEffect(() => {
+    const fetchTrainers = async () => {
+      try {
+        const response = await axios.get('/api/trainers');
+        setTrainers(response.data);
+      } catch (error) {
+        console.error('Error fetching trainers:', error);
+      }
+    };
 
-  const handleOpen = async (trainer = null) => {
+    fetchTrainers();
+  }, []);
+
+  const handleOpen = (trainer = null) => {
     if (trainer) {
-      const response = await axios.get(`/api/users/${trainer.user}`); // Fetch user data based on user ObjectId
+      setEditId(trainer._id);
       setFormData({
         name: trainer.name,
-        expertise: trainer.expertise,
+        expertise: trainer.expertise.join(', '), // Convert array to comma-separated string
         availability: trainer.availability,
-        contact: trainer.contact,
-        email: response.data.user.email, // Set the email fetched from User model
+        contactInfo: trainer.contactInfo,
+        email: trainer.user?.email || '',
       });
-      setEditId(trainer._id);
     } else {
-      setFormData({ name: '', expertise: '', availability: '', contact: '', email: '' });
+      setFormData({ name: '', expertise: '', availability: true, contactInfo: '', email: '' });
       setEditId(null);
     }
     setOpen(true);
   };
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setEditId(null);
+  };
 
   const handleSubmit = async () => {
+    // Prepare data for submission
     const trainerData = {
       name: formData.name,
-      expertise: formData.expertise,
-      contact: formData.contact,
+      expertise: formData.expertise.split(',').map((e) => e.trim()), // Convert string to array
       availability: formData.availability,
-      user: formData.email, // Use the email to get the user ObjectId or send email to create the user
+      contactInfo: formData.contactInfo,
+      email: formData.email,
     };
 
-    if (editId) {
-      await axios.put(`/api/trainers/${editId}`, trainerData);
-    } else {
-      await axios.post('/api/trainers', trainerData);
+    try {
+      if (editId) {
+        await axios.put(`/api/trainers/${editId}`, trainerData);
+      } else {
+        await axios.post('/api/trainers', trainerData);
+      }
+      const response = await axios.get('/api/trainers'); // Refresh list
+      setTrainers(response.data);
+      handleClose();
+    } catch (error) {
+      console.error('Error saving trainer:', error.response?.data?.message || error.message);
     }
-    fetchTrainers();
-    handleClose();
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`/api/trainers/${id}`);
-    fetchTrainers();
+    try {
+      await axios.delete(`/api/trainers/${id}`);
+      const response = await axios.get('/api/trainers'); // Refresh list
+      setTrainers(response.data);
+    } catch (error) {
+      console.error('Error deleting trainer:', error);
+    }
   };
 
-  useEffect(() => {
-    fetchTrainers();
-  }, []);
+  const handleToggleAvailability = () => {
+    // Toggle the availability value
+    setFormData({ ...formData, availability: !formData.availability });
+  };
+
+  const handleTrainerAvailabilityToggle = async (id, newAvailability) => {
+    try {
+      // Update the trainer's availability in the database
+      await axios.put(`/api/trainers/${id}`, { availability: newAvailability });
+  
+      // Update the trainer's availability in the local state
+      setTrainers((prevTrainers) =>
+        prevTrainers.map((trainer) =>
+          trainer._id === id ? { ...trainer, availability: newAvailability } : trainer
+        )
+      );
+    } catch (error) {
+      console.error('Error updating trainer availability:', error.response?.data?.message || error.message);
+    }
+  };
+  
 
   return (
     <Box sx={{ p: 3 }}>
@@ -91,13 +131,8 @@ const TrainerPage = ({ user }) => {
         Trainer Management
       </Typography>
 
-      {userRole?.role === 'Admin' && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleOpen()}
-          sx={{ mb: 2 }}
-        >
+      {userRole === 'Admin' && (
+        <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ mb: 2 }}>
           Add Trainer
         </Button>
       )}
@@ -110,19 +145,25 @@ const TrainerPage = ({ user }) => {
               <TableCell>Email</TableCell>
               <TableCell>Expertise</TableCell>
               <TableCell>Availability</TableCell>
-              <TableCell>Contact</TableCell>
-              {userRole?.role === 'Admin' && <TableCell>Actions</TableCell>}
+              <TableCell>Contact Info</TableCell>
+              {userRole === 'Admin' && <TableCell>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
             {trainers.map((trainer) => (
               <TableRow key={trainer._id}>
                 <TableCell>{trainer.name}</TableCell>
-                <TableCell>{trainer.user.email}</TableCell>
-                <TableCell>{trainer.expertise + ", "}</TableCell>
-                <TableCell>{trainer.availability ? 'Available' : 'Unavailable'}</TableCell>
+                <TableCell>{trainer.user?.email || 'N/A'}</TableCell>
+                <TableCell>{trainer.expertise.join(', ')}</TableCell>
+                <TableCell>
+                <Switch
+                    checked={trainer.availability}
+                    onChange={() => handleTrainerAvailabilityToggle(trainer._id, !trainer.availability)}
+                    color="primary"
+                />
+                </TableCell>
                 <TableCell>{trainer.contactInfo}</TableCell>
-                {userRole?.role === 'Admin' && (
+                {userRole === 'Admin' && (
                   <TableCell>
                     <Button onClick={() => handleOpen(trainer)}>Edit</Button>
                     <Button onClick={() => handleDelete(trainer._id)} color="error">
@@ -136,7 +177,6 @@ const TrainerPage = ({ user }) => {
         </Table>
       </TableContainer>
 
-      {/* Dialog for Add/Edit */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{editId ? 'Edit Trainer' : 'Add Trainer'}</DialogTitle>
         <DialogContent>
@@ -155,18 +195,12 @@ const TrainerPage = ({ user }) => {
             onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
           />
           <TextField
-            label="Availability"
+            label="Contact Info"
+            type='number'
             fullWidth
             margin="dense"
-            value={formData.availability}
-            onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
-          />
-          <TextField
-            label="Contact"
-            fullWidth
-            margin="dense"
-            value={formData.contact}
-            onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+            value={formData.contactInfo}
+            onChange={(e) => setFormData({ ...formData, contactInfo: e.target.value })}
           />
           <TextField
             label="Email"
@@ -174,7 +208,17 @@ const TrainerPage = ({ user }) => {
             margin="dense"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            disabled={editId !== null} // Disable email field if editing an existing trainer
+            disabled={editId !== null} // Disable email field when editing
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={formData.availability}
+                onChange={handleToggleAvailability} // Toggle the availability value
+                color="primary"
+              />
+            }
+            label={formData.availability ? 'Available' : 'Unavailable'} // Change label based on availability
           />
         </DialogContent>
         <DialogActions>

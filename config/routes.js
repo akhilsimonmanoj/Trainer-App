@@ -15,17 +15,22 @@ router.put('/trainers/:id', trainerController.updateTrainer)
 router.delete('/trainers/:id', trainerController.deleteTrainer)
 
 // Opportunity Routes
+
 // Get all opportunities
-router.get('/opportunities', opportunityController.getAllOpportunities);
+router.get('/opportunities', opportunityController.getAllOpportunities)
 // Add a new opportunity
-router.post('/opportunities', opportunityController.addOpportunity);
+router.post('/opportunities', opportunityController.addOpportunity)
 // Express interest in an opportunity
-router.put('/opportunities/:id/interest', opportunityController.expressInterest);
+router.put('/opportunities/:id/interest', opportunityController.expressInterest)
 
 // Operation Routes
-router.get('/operations', operationController.getAllOperations)
-router.post('/operations', operationController.addOperation) 
-router.put('/operations/:id/performance', operationController.updatePerformance)
+router.post('/operations', operationController.createOperation) // Create an operation
+router.get('/operations', operationController.getAllOperations) // Get all operations
+router.get('/operations/:id', operationController.getOperationById) // Get specific operation
+router.put('/operations/:id', operationController.updateOperation) // Update operation
+router.delete('/operations/:id', operationController.deleteOperation) // Delete operation
+router.put('/operations/:id/assign-trainer', operationController.assignTrainer) // Assign trainer
+router.put('/operations/:id/performance', operationController.updatePerformance) // Update performance
 
 // User Routes
 router.post('/user/register', userController.register)
@@ -38,5 +43,6 @@ router.get('/user/profile', authenticateUser, userController.getProfile)
 router.get('/user/admin', authenticateUser, authorizeRoles('Admin'), (req, res) => {
     res.json({ message: 'Welcome Admin' })
 })
+
 
 module.exports = router

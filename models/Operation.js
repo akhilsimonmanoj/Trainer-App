@@ -1,11 +1,19 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const operationSchema = new mongoose.Schema({
-    sessionDate: { type: Date, required: true },
-    trainer: { type: mongoose.Schema.Types.ObjectId, ref: 'Trainer', required: true },
-    opportunity: { type: mongoose.Schema.Types.ObjectId, ref: 'Opportunity', required: true },
-    performance: { type: String } // e.g., Excellent, Good, Needs Improvement
-});
+    scheduledDate: { type: Date, required: true }, // When the session is scheduled
+    trainer: { type: mongoose.Schema.Types.ObjectId, ref: 'Trainer', required: true }, // Assigned trainer
+    opportunity: { type: mongoose.Schema.Types.ObjectId, ref: 'Opportunity', required: true }, // Related opportunity
+    performance: { 
+        type: String, 
+        enum: ['Excellent', 'Good', 'Needs Improvement'], 
+        default: 'Good' 
+    }, // Performance rating
+    status: { 
+        type: String, 
+        enum: ['Scheduled', 'Completed', 'Cancelled'], 
+        default: 'Scheduled' 
+    } // Status tracking
+}, { timestamps: true }) // Adds createdAt and updatedAt
 
-const Operation = mongoose.model('Operation', operationSchema);
-module.exports = Operation;
+module.exports = mongoose.model('Operation', operationSchema)

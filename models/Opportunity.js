@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const opportunitySchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -6,7 +6,7 @@ const opportunitySchema = new mongoose.Schema({
     location: { type: String, required: true },
     trainersInterested: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Trainer' }], // Array of trainer IDs
     status: { type: String, default: 'Open' }
-});
+})
 
-const Opportunity = mongoose.model('Opportunity', opportunitySchema);
-module.exports = Opportunity;
+const Opportunity = mongoose.model('Opportunity', opportunitySchema)
+module.exports = Opportunity

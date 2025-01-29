@@ -10,18 +10,18 @@ exports.getAllTrainers = (req, res) => {
 
 exports.addTrainer = async (req, res) => {
     try {
-        const { name, email, expertise, contactInfo } = req.body;
+        const { name, email, expertise, contactInfo } = req.body
 
         // Check if a user account already exists for this email
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email })
         if (existingUser) {
-            return res.status(400).json({ message: 'User with this email already exists' });
+            return res.status(400).json({ message: 'User with this email already exists' })
         }
 
         // Create a corresponding User account with default password
-        const defaultPassword = 'password123'; // You can generate a random password here
-        const user = new User({ name, email, password: defaultPassword, role: 'Trainer' });
-        await user.save();
+        const defaultPassword = 'password123' // You can generate a random password here
+        const user = new User({ name, email, password: defaultPassword, role: 'Trainer' })
+        await user.save()
 
         // Create a new Trainer and associate the user
         const trainer = new Trainer({
@@ -30,23 +30,23 @@ exports.addTrainer = async (req, res) => {
             availability: true,
             contactInfo,
             user: user._id,
-        });
+        })
 
-        await trainer.save();
+        await trainer.save()
 
         // Populate the user field in the Trainer object
-        const populatedTrainer = await Trainer.findById(trainer._id).populate('user');
+        const populatedTrainer = await Trainer.findById(trainer._id).populate('user')
 
         // Respond with the created trainer
         res.status(201).json({
             message: 'Trainer and user account created successfully',
             trainer: populatedTrainer,
-        });
+        })
     } catch (error) {
-        console.error('Error adding trainer:', error);
-        res.status(500).json({ message: error.message });
+        console.error('Error adding trainer:', error)
+        res.status(500).json({ message: error.message })
     }
-};
+}
 
 
 exports.updateTrainer = (req, res) => {

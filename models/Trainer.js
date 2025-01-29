@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const trainerSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -9,7 +9,7 @@ const trainerSchema = new mongoose.Schema({
     },
     contactInfo: { type: String, required: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-});
+})
 
-const Trainer = mongoose.model('Trainer', trainerSchema);
-module.exports = Trainer;
+const Trainer = mongoose.model('Trainer', trainerSchema)
+module.exports = Trainer

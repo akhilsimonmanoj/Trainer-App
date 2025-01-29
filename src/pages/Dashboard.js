@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -8,31 +8,31 @@ import {
   MenuItem,
   IconButton,
   Box,
-} from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+} from '@mui/material'
+import { Menu as MenuIcon } from '@mui/icons-material'
+import { useNavigate } from 'react-router-dom'
 
 const Dashboard = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null)
+  const navigate = useNavigate()
 
   const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
 
   const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
+    localStorage.removeItem('token')
+    navigate('/login')
+  }
 
   const handleNavigation = (path) => {
-    navigate(path);
-    handleMenuClose();
-  };
+    navigate(path)
+    handleMenuClose()
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -65,7 +65,7 @@ const Dashboard = () => {
         </Typography>
       </Box>
     </Box>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard

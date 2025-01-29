@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, Alert } from '@mui/material';
+import React, { useState } from 'react'
+import { TextField, Button, Box, Typography, Alert } from '@mui/material'
 import {Link} from 'react-router-dom'
-import axios from 'axios';
+import axios from 'axios'
 
 const Register = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   const handleRegister = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      await axios.post('/api/register', { name, email, password });
-      setSuccess('Registration successful');
-      setError('');
+      await axios.post('/api/register', { name, email, password })
+      setSuccess('Registration successful')
+      setError('')
     } catch (err) {
-      setError(err.response.data.message || 'Registration failed');
-      setSuccess('');
+      setError(err.response.data.message || 'Registration failed')
+      setSuccess('')
     }
-  };
+  }
 
   return (
     <Box
@@ -70,7 +70,7 @@ const Register = () => {
         <Typography>Already have an account? <Link to='/login' style={{textDecoration: 'none'}}>Login</Link></Typography>
       </form>
     </Box>
-  );
-};
+  )
+}
 
-export default Register;
+export default Register

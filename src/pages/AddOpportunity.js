@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import axios from '../config/axiosConfig';
+import React, { useState } from 'react'
+import { Box, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import axios from '../config/axiosConfig'
 
 
 const AddOpportunityPage = () => {
@@ -9,47 +9,32 @@ const AddOpportunityPage = () => {
     type: '',
     location: '',
     status: 'Open'
-  });
+  })
 
   const handleChange = (e) => {
     setOpportunity({
       ...opportunity,
       [e.target.name]: e.target.value
-    });
-  };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       await axios.post('/api/opportunities', opportunity);
-//       alert('Opportunity added successfully!');
-//       setOpportunity({ title: '', type: '', location: '', status: 'Open' });
-//     } catch (error) {
-//       console.error('Error adding opportunity:', error);
-//     }
-//   };
+    })
+  }
 
 const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('Form submission triggered');
-    console.log('Opportunity data:', opportunity);
-  
+    e.preventDefault()  
     try {
-      const response = await axios.post('/api/opportunities', opportunity);
-      console.log('Success response:', response.data);
-      alert('Opportunity added successfully!');
-      setOpportunity({ name: '', type: '', location: '', status: 'Open' });
+      const response = await axios.post('/api/opportunities', opportunity)
+      alert('Opportunity added successfully!')
+      setOpportunity({ name: '', type: '', location: '', status: 'Open' })
     } catch (error) {
       // Log the entire error object to understand why the request failed
       if (error.response) {
-        console.error('Backend error response:', error.response.data);
+        console.error('Backend error response:', error.response.data)
       } else if (error.request) {
-        console.error('No response received:', error.request);
+        console.error('No response received:', error.request)
       } else {
-        console.error('Error setting up request:', error.message);
+        console.error('Error setting up request:', error.message)
       }
     }
-  };
+  }
   
 
   return (
@@ -98,7 +83,7 @@ const handleSubmit = async (e) => {
         </Button>
       </form>
     </Box>
-  );
-};
+  )
+}
 
-export default AddOpportunityPage;
+export default AddOpportunityPage

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Typography,
@@ -17,57 +17,57 @@ import {
   DialogTitle,
   Switch,
   FormControlLabel,
-} from '@mui/material';
-import axios from '../config/axiosConfig';
+} from '@mui/material'
+import axios from '../config/axiosConfig'
 
 const TrainerPage = ({ user }) => {
-  const userRole = user?.role;
-  const [trainers, setTrainers] = useState([]);
-  const [open, setOpen] = useState(false);
+  const userRole = user?.role
+  const [trainers, setTrainers] = useState([])
+  const [open, setOpen] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     expertise: '',
     availability: true,
     contactInfo: '',
     email: '',
-  });
-  const [editId, setEditId] = useState(null);
+  })
+  const [editId, setEditId] = useState(null)
 
   // Fetch trainers on component mount
   useEffect(() => {
     const fetchTrainers = async () => {
       try {
-        const response = await axios.get('/api/trainers');
-        setTrainers(response.data);
+        const response = await axios.get('/api/trainers')
+        setTrainers(response.data)
       } catch (error) {
-        console.error('Error fetching trainers:', error);
+        console.error('Error fetching trainers:', error)
       }
-    };
+    }
 
-    fetchTrainers();
-  }, []);
+    fetchTrainers()
+  }, [])
 
   const handleOpen = (trainer = null) => {
     if (trainer) {
-      setEditId(trainer._id);
+      setEditId(trainer._id)
       setFormData({
         name: trainer.name,
         expertise: trainer.expertise.join(', '), // Convert array to comma-separated string
         availability: trainer.availability,
         contactInfo: trainer.contactInfo,
         email: trainer.user?.email || '',
-      });
+      })
     } else {
-      setFormData({ name: '', expertise: '', availability: true, contactInfo: '', email: '' });
-      setEditId(null);
+      setFormData({ name: '', expertise: '', availability: true, contactInfo: '', email: '' })
+      setEditId(null)
     }
-    setOpen(true);
-  };
+    setOpen(true)
+  }
 
   const handleClose = () => {
-    setOpen(false);
-    setEditId(null);
-  };
+    setOpen(false)
+    setEditId(null)
+  }
 
   const handleSubmit = async () => {
     // Prepare data for submission
@@ -77,52 +77,52 @@ const TrainerPage = ({ user }) => {
       availability: formData.availability,
       contactInfo: formData.contactInfo,
       email: formData.email,
-    };
+    }
 
     try {
       if (editId) {
-        await axios.put(`/api/trainers/${editId}`, trainerData);
+        await axios.put(`/api/trainers/${editId}`, trainerData)
       } else {
-        await axios.post('/api/trainers', trainerData);
+        await axios.post('/api/trainers', trainerData)
       }
-      const response = await axios.get('/api/trainers'); // Refresh list
-      setTrainers(response.data);
-      handleClose();
+      const response = await axios.get('/api/trainers') // Refresh list
+      setTrainers(response.data)
+      handleClose()
     } catch (error) {
-      console.error('Error saving trainer:', error.response?.data?.message || error.message);
+      console.error('Error saving trainer:', error.response?.data?.message || error.message)
     }
-  };
+  }
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/trainers/${id}`);
-      const response = await axios.get('/api/trainers'); // Refresh list
-      setTrainers(response.data);
+      await axios.delete(`/api/trainers/${id}`)
+      const response = await axios.get('/api/trainers') // Refresh list
+      setTrainers(response.data)
     } catch (error) {
-      console.error('Error deleting trainer:', error);
+      console.error('Error deleting trainer:', error)
     }
-  };
+  }
 
   const handleToggleAvailability = () => {
     // Toggle the availability value
-    setFormData({ ...formData, availability: !formData.availability });
-  };
+    setFormData({ ...formData, availability: !formData.availability })
+  }
 
   const handleTrainerAvailabilityToggle = async (id, newAvailability) => {
     try {
       // Update the trainer's availability in the database
-      await axios.put(`/api/trainers/${id}`, { availability: newAvailability });
+      await axios.put(`/api/trainers/${id}`, { availability: newAvailability })
   
       // Update the trainer's availability in the local state
       setTrainers((prevTrainers) =>
         prevTrainers.map((trainer) =>
           trainer._id === id ? { ...trainer, availability: newAvailability } : trainer
         )
-      );
+      )
     } catch (error) {
-      console.error('Error updating trainer availability:', error.response?.data?.message || error.message);
+      console.error('Error updating trainer availability:', error.response?.data?.message || error.message)
     }
-  };
+  }
   
 
   return (
@@ -229,7 +229,7 @@ const TrainerPage = ({ user }) => {
         </DialogActions>
       </Dialog>
     </Box>
-  );
-};
+  )
+}
 
-export default TrainerPage;
+export default TrainerPage

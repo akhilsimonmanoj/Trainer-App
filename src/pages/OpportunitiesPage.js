@@ -1,61 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, FormControl, InputLabel, Select, MenuItem, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import axios from '../config/axiosConfig';
+import React, { useState, useEffect } from 'react'
+import { Box, Typography, FormControl, InputLabel, Select, MenuItem, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
+import axios from '../config/axiosConfig'
 
 const OpportunitiesPage = ({ user }) => {
-  console.log({user});
 
-  const [opportunities, setOpportunities] = useState([]);
-  const [filteredOpportunities, setFilteredOpportunities] = useState([]);
-  const [filter, setFilter] = useState({ type: '', location: '' });
-
-  useEffect(() => {
-    fetchOpportunities();
-  }, []);
+  const [opportunities, setOpportunities] = useState([])
+  const [filteredOpportunities, setFilteredOpportunities] = useState([])
+  const [filter, setFilter] = useState({ type: '', location: '' })
 
   useEffect(() => {
-    filterOpportunities();
-  }, [filter, opportunities]);
+    fetchOpportunities()
+  }, [])
+
+  useEffect(() => {
+    filterOpportunities()
+  }, [filter, opportunities])
 
   const fetchOpportunities = async () => {
     try {
-      const response = await axios.get('/api/opportunities');
-      setOpportunities(response.data);
+      const response = await axios.get('/api/opportunities')
+      setOpportunities(response.data)
     } catch (error) {
-      console.error('Error fetching opportunities:', error);
+      console.error('Error fetching opportunities:', error)
     }
-  };
+  }
 
   const filterOpportunities = () => {
     const filtered = opportunities.filter(opportunity => {
       return (
         (filter.type === '' || opportunity.type === filter.type) &&
         (filter.location === '' || opportunity.location === filter.location)
-      );
-    });
-    setFilteredOpportunities(filtered);
-  };
+      )
+    })
+    setFilteredOpportunities(filtered)
+  }
 
   const handleFilterChange = (e) => {
     setFilter({
       ...filter,
       [e.target.name]: e.target.value
-    });
-  };
+    })
+  }
 
   const handleExpressInterest = async (id, opportunityType) => {
-    const userId = user.id;  // Get user ID from the context or state
+    const userId = user.id  // Get user ID from the context or state
 
     const interestData = {
       userId: userId,  // The user expressing interest
       interestType: opportunityType,  // The type of interest based on the opportunity type
-    };
-
-    console.log('Sending interest data:', interestData);
+    }
 
     try {
       // Send the user's ID to be added to the trainersInterested array while keeping status "Open" for others
-      const response = await axios.put(`/api/opportunities/${id}/interest`, interestData);
+      const response = await axios.put(`/api/opportunities/${id}/interest`, interestData)
 
       // Update local state to reflect the change
       const updatedOpportunities = opportunities.map((opportunity) =>
@@ -66,20 +63,19 @@ const OpportunitiesPage = ({ user }) => {
               
             }
           : opportunity
-      );
-      setOpportunities(updatedOpportunities);
+      )
+      setOpportunities(updatedOpportunities)
 
-      console.log('Interest expressed successfully:', response);
     } catch (error) {
       if (error.message) {
-        alert('You have already expressed Interest');
+        alert('You have already expressed Interest')
       } else if (error.request) {
-        console.error('No response received:', error.request);
+        console.error('No response received:', error.request)
       } else {
-        console.error('Error setting up request:', error.message);
+        console.error('Error setting up request:', error.message)
       }
     }
-  };
+  }
 
   return (
     <Box sx={{ p: 3 }}>
@@ -158,7 +154,7 @@ const OpportunitiesPage = ({ user }) => {
         </Table>
       </TableContainer>
     </Box>
-  );
-};
+  )
+}
 
-export default OpportunitiesPage;
+export default OpportunitiesPage

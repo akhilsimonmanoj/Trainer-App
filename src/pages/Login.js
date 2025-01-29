@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, Alert } from '@mui/material';
+import React, { useState } from 'react'
+import { TextField, Button, Box, Typography, Alert } from '@mui/material'
 import {Link} from 'react-router-dom'
-import axios from '../config/axiosConfig';
+import axios from '../config/axiosConfig'
 import {useNavigate} from 'react-router-dom'
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const navigate = useNavigate()
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      const response = await axios.post('/api/user/login', { email, password });
-      const { user, token } = response.data; // Assuming the backend sends both user and token
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', token);
-      setSuccess('Login successful');
-      setError('');
-      navigate('/dashboard');
+      const response = await axios.post('/api/user/login', { email, password })
+      const { user, token } = response.data // Assuming the backend sends both user and token
+      localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('token', token)
+      setSuccess('Login successful')
+      setError('')
+      navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-      setSuccess('');
+      setError(err.response?.data?.message || 'Login failed')
+      setSuccess('')
     }
-  };
+  }
   
 
   return (
@@ -68,7 +68,7 @@ const Login = () => {
         <Typography>Dont have an account? <Link to='/register' style={{textDecoration: 'none'}}>Register</Link></Typography>
       </form>
     </Box>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
